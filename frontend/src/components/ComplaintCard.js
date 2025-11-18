@@ -29,7 +29,7 @@ function ComplaintCard({ complaint, onClick }) {
     <div className="complaint-card" onClick={handleCardClick}>
       <div className="card-header">
         <span className="card-category">{complaint.category}</span>
-        <span className={`status-tag status-${complaint.status.toLowerCase().replace(' ', '-')}`}>
+        <span className={`status-tag status-${complaint.status? complaint.status.toLowerCase().replace(' ', '-'): 'null'}`}>
           {complaint.status}
         </span>
       </div>

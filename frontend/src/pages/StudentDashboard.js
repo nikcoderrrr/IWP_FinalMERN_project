@@ -43,17 +43,22 @@ function StudentDashboard() {
     navigate('/login');
   };
 
-  const processedComplaints = allComplaints
+const processedComplaints = allComplaints
     .filter(complaint => {
-      return statusFilter === 'All' || complaint.status === statusFilter;
+      // Safeguarding against missing status property
+      const currentStatus = complaint.status || 'Unknown';
+      return statusFilter === 'All' || currentStatus === statusFilter;
     })
     .filter(complaint => {
-      return categoryFilter === 'All' || complaint.category === categoryFilter;
+      // Safeguarding against missing category property
+      const currentCategory = complaint.category || 'Other';
+      return categoryFilter === 'All' || currentCategory === categoryFilter;
     })
     .filter(complaint => {
       const search = searchTerm.toLowerCase();
-      return complaint.title.toLowerCase().includes(search) ||
-             complaint.description.toLowerCase().includes(search);
+      // Safeguarding title and description by using || ''
+      return (complaint.title || '').toLowerCase().includes(search) ||
+             (complaint.description || '').toLowerCase().includes(search);
     })
     .sort((a, b) => {
       if (sortBy === 'newest') {

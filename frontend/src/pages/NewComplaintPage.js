@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ComplaintService from '../services/ComplaintService';
 import { COMPLAINT_CATEGORIES } from '../config';
+import { useAuth } from '../context/AuthContext';
 import './NewComplaintPage.css';
 
 function NewComplaintPage() {
@@ -15,6 +16,8 @@ function NewComplaintPage() {
   const [error, setError] = useState(null);
   
   const navigate = useNavigate();
+
+  const { currentUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +34,7 @@ function NewComplaintPage() {
     };
 
     try {
-      await ComplaintService.createComplaint(complaintData);
+      await ComplaintService.createComplaint(complaintData, currentUser.hostelId);
       setIsLoading(false);
       navigate('/student-dashboard');
     } catch (err) {

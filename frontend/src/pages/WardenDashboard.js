@@ -29,25 +29,29 @@ function WardenDashboard() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
 
-  useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        const [complaintsData, maintenanceData] = await Promise.all([
-          ComplaintService.getAllComplaints(),
-          ComplaintService.getMaintenanceChecks()
-        ]);
-        setAllComplaints(complaintsData);
-        setMaintenanceChecks(maintenanceData);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    };
-    fetchAllData();
+useEffect(() => {
+    // We only fetch data if the user object is available
+    if (currentUser) {
+      const fetchAllData = async () => {
+        try {
+          const [complaintsData, maintenanceData] = await Promise.all([
+            // Pass the user's hostelId to both services
+            ComplaintService.getAllComplaints(currentUser.hostelId),
+            ComplaintService.getMaintenanceChecks(currentUser.hostelId)
+          ]);
+          setAllComplaints(complaintsData);
+          setMaintenanceChecks(maintenanceData);
+        } catch (error) {
+          console.error("Failed to fetch data:", error);
+        }
+      };
+      fetchAllData();
+    }
     
     const handleResize = () => setIsMobile(window.innerWidth <= 900);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [currentUser]);
 
   const allTasks = useMemo(() => {
     const complaintsAsTasks = allComplaints.map(c => ({

@@ -85,7 +85,7 @@ function ComplaintDetailPanel({ complaintId, onClose }) {
           </div>
           <h2 className="panel-title">
             {complaint.title}
-            <span>ID: #{complaint.id}</span>
+            <span>ID: #{complaint._id}</span>
           </h2>
         </header>
         
@@ -96,12 +96,12 @@ function ComplaintDetailPanel({ complaintId, onClose }) {
           >
             Details
           </button>
-          <button 
+          {/* <button 
             className={`panel-tab ${activeTab === 'timeline' ? 'active' : ''}`}
             onClick={() => setActiveTab('timeline')}
           >
             Timeline
-          </button>
+          </button> */}
         </div>
 
         <div className="panel-content">

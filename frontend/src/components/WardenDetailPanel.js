@@ -101,12 +101,12 @@ function WardenDetailPanel({ complaintId, onClose , onUpdate}) {
           >
             Manage
           </button>
-          <button 
+          {/* <button 
             className={`panel-tab ${activeTab === 'timeline' ? 'active' : ''}`}
             onClick={() => setActiveTab('timeline')}
           >
             Timeline
-          </button>
+          </button> */}
         </div>
 
         <div className="panel-content">

@@ -22,7 +22,7 @@ function ComplaintCard({ complaint, onClick }) {
   };
 
   const handleCardClick = () => {
-    onClick(complaint.id);
+    onClick(complaint._id);
   };
 
   return (

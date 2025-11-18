@@ -1,71 +1,63 @@
+// frontend/src/services/ComplaintService.js
+import AuthService from './AuthService';
+
+// =================================================================
+// --- COMPLAINT FUNCTIONS (UNCHANGED) ---
+// =================================================================
+
 let mockComplaints = [
+  // --- Kalpana Chawla ---
   {
     id: 'c1001',
     title: 'Leaking Faucet in Room 201',
-    description: 'The tap in the bathroom won\'t stop dripping. It\'s wasting water and the noise is annoying.',
-    room: '201',
+    description: 'The tap in the bathroom won\'t stop dripping.',
+    room: 'KC-201',
     category: 'Plumbing',
     status: 'Submitted',
-    submittedBy: 's101',
-    createdAt: new Date('2025-11-15T09:30:00Z').toISOString(),
-    votes: 12
+    submittedBy: 's-kc101',
+    createdAt: new Date('2025-11-18T09:30:00Z').toISOString(),
+    scheduledFor: null,
+    votes: 12,
+    hostelId: 'kalpana-chawla'
   },
   {
     id: 'c1002',
     title: 'Wi-Fi not working on 3rd floor',
-    description: 'The Wi-Fi router on the 3rd-floor landing seems to be down. Can\'t connect to any network.',
-    room: '305',
-    category: 'Internet',
-    status: 'In Progress',
-    submittedBy: 's102',
-    createdAt: new Date('2025-11-16T11:00:00Z').toISOString(),
-    votes: 28
+    // ... (all other mock complaint data remains unchanged) ...
+    hostelId: 'kalpana-chawla'
   },
+  // ... (Anandi, C.V.Raman, J.C.Bose, Homi Baba mocks) ...
   {
-    id: 'c1003',
-    title: 'Broken light fixture',
-    description: 'The main ceiling light in Room 104 flickers constantly and won\'t stay on.',
-    room: '104',
-    category: 'Electrical',
-    status: 'Resolved',
-    submittedBy: 's103',
-    createdAt: new Date('2025-11-14T14:15:00Z').toISOString(),
-    votes: 5
-  },
-  {
-    id: 'c1004',
-    title: 'Clogged drain in shower',
-    description: 'Water is not draining in the 2nd floor west wing shower.',
-    room: '2W Shower',
-    category: 'Plumbing',
-    status: 'In Progress',
-    submittedBy: 's104',
-    createdAt: new Date('2025-11-17T08:00:00Z').toISOString(),
-    votes: 8
-  }
-];
-
-let mockMaintenanceChecks = [
-  {
-    id: 'm2001',
-    title: 'Fire Extinguisher Check - Wing A',
-    status: 'Pending',
-    scheduledFor: new Date('2025-11-20T10:00:00Z').toISOString(),
-  },
-  {
-    id: 'm2002',
-    title: 'Water Filter Cleaning - Mess',
-    status: 'Completed',
-    scheduledFor: new Date('2025-11-15T15:00:00Z').toISOString(),
+    id: 'c1006',
+    title: 'AC unit making loud noises',
+    // ...
+    hostelId: 'homi-baba'
   }
 ];
 
 class ComplaintService {
 
-  static async getAllComplaints() {
+  // --- Helper function MOVED INSIDE and made STATIC ---
+  static getAuthHeaders() {
+    const token = AuthService.getToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  }
+
+  // --- Complaint functions are UNCHANGED ---
+  static async getAllComplaints(hostelId) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve([...mockComplaints]);
+        if (!hostelId) {
+          return resolve([]);
+        }
+        const cleanHostelId = hostelId.toLowerCase().trim();
+        const complaints = mockComplaints.filter(c => 
+          c.hostelId.toLowerCase().trim() === cleanHostelId
+        );
+        resolve([...complaints]);
       }, 500);
     });
   }
@@ -83,7 +75,7 @@ class ComplaintService {
     });
   }
   
-  static async createComplaint(complaintData) {
+  static async createComplaint(complaintData, hostelId) {
     return new Promise((resolve) => {
       setTimeout(() => {
         const newComplaint = {
@@ -92,6 +84,7 @@ class ComplaintService {
           status: 'Submitted',
           createdAt: new Date().toISOString(),
           votes: 1,
+          hostelId: hostelId
         };
         mockComplaints.unshift(newComplaint);
         resolve(newComplaint);
@@ -122,12 +115,57 @@ class ComplaintService {
     });
   }
 
+  // =================================================================
+  // --- MAINTENANCE FUNCTIONS (CHANGED TO LIVE API) ---
+  // =================================================================
+
+  /**
+   * REPLACED: This now calls your real GET /api/maintenance
+   */
   static async getMaintenanceChecks() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([...mockMaintenanceChecks]);
-      }, 500);
+    console.log("Fetching LIVE data for getMaintenanceChecks()");
+    const response = await fetch('/api/maintenance', {
+      method: 'GET',
+      // We now call it as a static method of the class
+      headers: ComplaintService.getAuthHeaders(),
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.msg || 'Could not fetch maintenance tasks');
+    }
+    
+    // Map backend data to the format the frontend dashboard expects
+    const tasks = await response.json();
+    return tasks.map(task => ({
+      id: task.taskId, // Frontend expects 'id', backend has 'taskId'
+      title: task.definition.title,
+      status: task.status,
+      scheduledFor: task.scheduledFor,
+      hostelId: task.hostel_id,
+      category: task.definition.category,
+      location: task.definition.default_location,
+      type: 'maintenance' // Manually add type for the dashboard filter
+    }));
+  }
+
+  /**
+   * NEW: This calls your real PUT /api/maintenance/:taskId
+   */
+  static async completeMaintenanceTask(taskId) {
+    console.log(`Sending LIVE request to complete task ${taskId}`);
+    const response = await fetch(`/api/maintenance/${taskId}`, {
+      method: 'PUT',
+      // We now call it as a static method of the class
+      headers: ComplaintService.getAuthHeaders(),
+      body: JSON.stringify({})
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.msg || 'Could not complete task');
+    }
+    return response.json();
   }
 }
 

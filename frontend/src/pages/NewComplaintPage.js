@@ -31,6 +31,8 @@ function NewComplaintPage() {
       description,
       room,
       category: finalCategory,
+      hostelId: currentUser.hostelId,
+      submittedBy: currentUser.id
     };
 
     try {

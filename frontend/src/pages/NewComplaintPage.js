@@ -11,18 +11,43 @@ function NewComplaintPage() {
   const [room, setRoom] = useState('');
   const [category, setCategory] = useState('');
   const [otherCategory, setOtherCategory] = useState('');
-
+  
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   
   const navigate = useNavigate();
-
   const { currentUser } = useAuth();
+
+  const handleAiGenerate = async () => {
+    if (!description || description.length < 10) {
+      setError("Please enter a description first.");
+      return;
+    }
+    
+    setIsGenerating(true);
+    setError(null);
+    
+    try {
+      const generatedTitle = await ComplaintService.generateTitle(description);
+      setTitle(generatedTitle.replace(/^"|"$/g, '')); 
+    } catch (err) {
+      setError("Could not auto-generate. Please type manually.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+
+    if (!currentUser?.hostelId) {
+      setError('User data missing. Please log in again.');
+      setIsLoading(false);
+      return;
+    }
 
     const finalCategory = category === 'Other' ? otherCategory : category;
 
@@ -32,7 +57,7 @@ function NewComplaintPage() {
       room,
       category: finalCategory,
       hostelId: currentUser.hostelId,
-      submittedBy: currentUser.id
+      submittedBy: currentUser.id,
     };
 
     try {
@@ -57,15 +82,37 @@ function NewComplaintPage() {
         <form onSubmit={handleSubmit}>
           
           <div className="form-group">
-            <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              id="title"
-              placeholder="e.g., Leaking Faucet in Room 201"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              placeholder="Describe the issue in detail..."
+              rows="6"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               required
-            />
+            ></textarea>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="title">Subject / Title</label>
+            <div className="subject-input-group">
+              <input
+                type="text"
+                id="title"
+                placeholder="Short subject..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+              <button 
+                type="button" 
+                className="ai-button" 
+                onClick={handleAiGenerate}
+                disabled={isGenerating || !description}
+              >
+                {isGenerating ? 'Generating...' : 'Auto-generate'}
+              </button>
+            </div>
           </div>
 
           <div className="form-group">
@@ -102,23 +149,11 @@ function NewComplaintPage() {
             <input
               type="text"
               id="room"
-              placeholder="e.g., Room 201, 3rd Floor Washroom"
+              placeholder="e.g., Room 201"
               value={room}
               onChange={(e) => setRoom(e.target.value)}
               required
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              placeholder="Describe the issue in detail..."
-              rows="6"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            ></textarea>
           </div>
 
           {error && <p className="error-message">{error}</p>}

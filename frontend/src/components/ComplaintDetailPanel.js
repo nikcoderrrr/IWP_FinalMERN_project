@@ -118,10 +118,12 @@ function ComplaintDetailPanel({ complaintId, onClose }) {
                   <strong>{isOriginalPoster ? "You" : `User ${complaint.submittedBy}`}</strong>
                   <span>Submitted</span>
                   <strong>{new Date(complaint.createdAt).toLocaleString()}</strong>
+                  <span>Description</span>
+                  <p className="complaint-description">{complaint.description}</p>
                 </div>
               </section>
 
-              <section className="panel-confirmation-section">
+              {/* <section className="panel-confirmation-section">
                 <h4>Confirmation</h4>
                 {isOriginalPoster && isResolvedByWarden && (
                   <div className="action-box">
@@ -136,7 +138,7 @@ function ComplaintDetailPanel({ complaintId, onClose }) {
                 {!isOriginalPoster && (
                   <p className="sidebar-note">Only the original poster can confirm this complaint.</p>
                 )}
-              </section>
+              </section> */}
             </>
           )}
 

@@ -36,7 +36,7 @@ const ComplaintSchema = new mongoose.Schema({
     },
     votes: {
         type: Number,
-        default: 0
+        default: 1
     }
 }, { timestamps: true });
 

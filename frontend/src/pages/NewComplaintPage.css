@@ -41,6 +41,7 @@
   margin-bottom: 0.5rem;
 }
 
+/* Common Input Styles */
 .form-group input,
 .form-group textarea,
 .form-group select {
@@ -55,20 +56,12 @@
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.form-group select {
-  padding: 0.85rem 2.5rem 0.85rem 1rem;
-}
-
 .form-group textarea {
   resize: vertical;
   min-height: 120px;
 }
 
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #666;
-}
-
+/* Focus States */
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
@@ -77,13 +70,65 @@
   box-shadow: 0 0 0 3px rgba(228, 165, 118, 0.2);
 }
 
+/* --- NEW SUBJECT GROUP STYLES --- */
+.subject-input-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch; /* Ensures button and input are same height */
+}
+
+.subject-input-group input {
+  flex-grow: 1; /* Input takes up all available space */
+}
+
+.ai-button {
+  white-space: nowrap; /* Prevents text from wrapping */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--primary-accent);
+  padding: 0 1.2rem; /* Horizontal padding only */
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-button:hover {
+  border-color: var(--primary-accent);
+  background: var(--primary-accent);
+  color: var(--text-light);
+  transform: translateY(-1px);
+}
+
+.ai-button:active {
+  transform: translateY(0);
+}
+
+.ai-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(204, 213, 210, 0.05);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+  transform: none;
+}
+
+/* Error Message */
 .error-message {
   color: var(--error);
   font-size: 0.9rem;
   text-align: center;
   margin-bottom: 1rem;
+  background: rgba(223, 92, 86, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
 }
 
+/* Bottom Actions */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -108,7 +153,6 @@
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
 }
-
 .cancel-button:hover {
   background: rgba(204, 213, 210, 0.1);
   color: var(--text-primary);
@@ -118,17 +162,16 @@
   background: var(--primary-accent);
   color: var(--bg-primary);
 }
-
 .submit-button:hover {
   background: var(--primary-accent-hover);
 }
-
 .submit-button:disabled {
   background-color: #555;
   color: #999;
   cursor: not-allowed;
 }
 
+/* Animation */
 .other-category-fade-in {
   animation: fadeIn 0.3s ease;
 }
@@ -138,25 +181,30 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 768px) {
+/* Mobile Responsive */
+@media (max-width: 600px) {
   .new-complaint-page {
     padding: 1rem;
-    align-items: flex-start;
-    min-height: auto;
   }
   .form-container {
-    padding: 2rem 1.5rem;
-    border: none;
-    box-shadow: none;
-    background: transparent;
+    padding: 1.5rem;
+  }
+  
+  /* Stack the input and button on very small screens */
+  .subject-input-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .ai-button {
+    padding: 0.8rem;
+    width: 100%;
   }
   
   .form-actions {
     flex-direction: column-reverse;
   }
-  
-  .submit-button,
-  .cancel-button {
+  .submit-button, .cancel-button {
     width: 100%;
   }
 }

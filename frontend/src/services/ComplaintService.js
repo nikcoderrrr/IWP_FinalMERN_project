@@ -280,6 +280,29 @@ class ComplaintService {
       throw error;
     }
   }
+
+  static async generateTitle(description) {
+    try {
+      const token = this.getToken();
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch('/api/ai/generate-title', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ description }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'AI generation failed');
+      
+      return data.title;
+    } catch (error) {
+      console.error('Error generating title:', error);
+      throw error;
+    }
+  }
+
 }
 
 

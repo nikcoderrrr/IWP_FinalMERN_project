@@ -7,27 +7,30 @@ const app = express();
 // Middleware
 app.use(express.json()); // Allows parsing of JSON request bodies
 
-// DB Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error(err));
-
-
 // --- Define Routes ---
 const authRoutes = require('./routes/auth');
 const maintenanceRoutes = require('./routes/maintenanceRoutes'); 
 const { verifyToken } = require('./middleware/auth');
 const complaintroutes = require('./routes/complaints')
+const aiRoutes = require('./routes/aiRoutes');
+
+// Logger Middleware
+app.use((req,res,next) => {
+    console.log(req.path, req.method)
+    next()
+})
+
 
 // Mount the Auth Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/maintenance', maintenanceRoutes); 
 app.use('/api/complaints', complaintroutes);
+app.use('/api/ai', aiRoutes);
 
-app.use((req,res,next) => {
-    console.log(req.path, req.method)
-    next()
-})
+// DB Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.error(err));
 
 // Basic Test Route
 app.get('/', (req, res) => {

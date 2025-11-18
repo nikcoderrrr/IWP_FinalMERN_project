@@ -20,17 +20,23 @@ function StudentDashboard() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
 
-  useEffect(() => {
-    const fetchComplaints = async () => {
-      try {
-        const data = await ComplaintService.getAllComplaints();
-        setAllComplaints(data);
-      } catch (error) {
-        console.error("Failed to fetch complaints:", error);
-      }
-    };
-    fetchComplaints();
-  }, []);
+  //console.log("CURRENT USER DATA (Dashboard):", currentUser);
+
+ useEffect(() => {
+    // We only fetch data if the user object is available
+    if (currentUser) {
+      const fetchComplaints = async () => {
+        try {
+          // Pass the user's hostelId to the service
+          const data = await ComplaintService.getAllComplaints(currentUser.hostelId);
+          setAllComplaints(data);
+        } catch (error) {
+          console.error("Failed to fetch complaints:", error);
+        }
+      };
+      fetchComplaints();
+    }
+  }, [currentUser]);
   
   const handleLogout = () => {
     logout();

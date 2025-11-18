@@ -1,1 +1,3 @@
 this is the backend folder, please add files here
+hello i am nidhi
+nikkki is amazing
